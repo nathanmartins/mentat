@@ -8,6 +8,7 @@ import (
 	"k8s.io/client-go/rest"
 	"log"
 	"net"
+	"os"
 	"time"
 )
 
@@ -39,6 +40,20 @@ func getNodeList() ([]string, error) {
 	}
 
 	return simpleList, nil
+}
+
+func getNodeName() (string, error) {
+	name := os.Getenv("NODE_NAME")
+
+	var err error
+
+	// This method is unreliable since it will return just the pod name.
+	if name == "" {
+		name, err = os.Hostname()
+	}
+
+	return name, err
+
 }
 
 func pingHost(destination string) (time.Duration, error) {

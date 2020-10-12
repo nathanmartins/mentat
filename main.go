@@ -6,13 +6,12 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
 	"net/http"
-	"os"
 	"time"
 )
 
 func main() {
 
-	hostname, err := os.Hostname()
+	hostname, err := getNodeName()
 	if err != nil {
 		log.Fatalf("failed getting hostname: %s", err)
 	}
