@@ -1,71 +1,44 @@
 package main
 
 import (
-	"crypto/tls"
-	"encoding/json"
-	"fmt"
+	"context"
 	"github.com/digineo/go-ping"
-	"io/ioutil"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"log"
 	"net"
-	"net/http"
 	"time"
 )
 
-type NodeList struct {
-	Items []struct {
-		Metadata struct {
-			Name string `json:"name"`
-			UID  string `json:"uid"`
-		} `json:"metadata"`
-	} `json:"items"`
-}
+func getNodeList() ([]string, error) {
 
-func getNodeList() (NodeList, error) {
+	var simpleList []string
 
-	var nodes NodeList
-
-	// Disabling https checks
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	client := &http.Client{Transport: tr}
-
-	addr := "http://localhost:8001/api/v1/nodes?limit=500"
-
-	req, err := http.NewRequest("GET", addr, nil)
+	// Get configuration from within the cluster itself
+	config, err := rest.InClusterConfig()
 	if err != nil {
-		return nodes, err
+		return simpleList, err
 	}
 
-	data, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/token")
+	c, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		return nodes, err
+		return simpleList, err
 	}
 
-	req.Header.Set("Authorization", fmt.Sprintf("Basic %s", string(data)))
+	nodes, err := c.CoreV1().Nodes().List(context.Background(), metav1.ListOptions{
+		Limit: 500,
+	})
 
-	resp, err := client.Do(req)
 	if err != nil {
-		return nodes, err
+		return simpleList, err
 	}
 
-	// this might be over-written by other errors later on but it doesn't matter.
-	defer func() {
-		err = resp.Body.Close()
-	}()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nodes, err
+	for _, items := range nodes.Items {
+		simpleList = append(simpleList, items.Name)
 	}
 
-	err = json.Unmarshal(body, &nodes)
-	if err != nil {
-		return nodes, err
-	}
-
-	return nodes, err
+	return simpleList, nil
 }
 
 func pingHost(destination string) (time.Duration, error) {

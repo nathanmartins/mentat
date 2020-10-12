@@ -39,9 +39,11 @@ func main() {
 				log.Fatalf("failed getting node list: %s", err)
 			}
 
-			for _, h := range hosts.Items {
+			if len(hosts) == 0 {
+				log.Fatal("getNodes returned 0 nodes")
+			}
 
-				host := h.Metadata.Name
+			for _, host := range hosts {
 
 				rtt, err := pingHost(host)
 				if err != nil {
