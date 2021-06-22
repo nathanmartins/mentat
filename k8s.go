@@ -63,16 +63,12 @@ func pingHost(destination string) (time.Duration, error) {
 	var pinger *ping.Pinger
 	var rtt time.Duration
 
-	if r, err := net.ResolveIPAddr("ip4", destination); err != nil {
+	if remoteAddr, err := net.ResolveIPAddr("ip4", destination); err != nil {
 		return rtt, err
-	} else {
-		remoteAddr = r
 	}
 
-	if p, err := ping.New(bind, ""); err != nil {
+	if pinger, err := ping.New(bind, ""); err != nil {
 		return rtt, err
-	} else {
-		pinger = p
 	}
 
 	defer pinger.Close()
