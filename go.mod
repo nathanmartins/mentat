@@ -1,6 +1,6 @@
 module github.com/nathanmartins/mentat
 
-go 1.15
+go 1.25.3
 
 require (
 	github.com/digineo/go-ping v1.0.0
