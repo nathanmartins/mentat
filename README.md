@@ -1,5 +1,7 @@
 # mentat — Inter‑node latency exporter for Kubernetes
 
+[![CI](https://github.com/nathanmartins/mentat/actions/workflows/ci.yaml/badge.svg)](https://github.com/nathanmartins/mentat/actions/workflows/ci.yaml)
+
 mentat discovers Kubernetes nodes via the in‑cluster API, pings them using ICMP, and exposes round‑trip time (RTT) metrics on a Prometheus endpoint. Use it to observe network latency between nodes in your cluster.
 
 ## Features
