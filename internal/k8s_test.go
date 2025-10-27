@@ -31,7 +31,7 @@ func TestGetNodeName(t *testing.T) {
 				_ = os.Unsetenv("NODE_NAME")
 			}
 
-			got, err := getNodeName()
+			got, err := GetNodeName()
 			if err != nil {
 				t.Fatalf("getNodeName returned error: %v", err)
 			}
@@ -72,7 +72,7 @@ func TestPingHost_Errors(t *testing.T) {
 
 func TestGetNodeList_OutOfCluster(t *testing.T) {
 	// We expect an error when running outside a Kubernetes cluster.
-	nodes, err := getNodeList()
+	nodes, err := GetNodeList()
 	if err == nil {
 		t.Fatalf("expected error when not running in cluster, got nodes: %v", nodes)
 	}
