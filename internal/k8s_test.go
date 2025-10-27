@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"os"
@@ -63,7 +63,7 @@ func TestPingHost_Errors(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if _, err := pingHost(tt.destination); err == nil {
+			if _, err := PingHost(tt.destination); err == nil {
 				t.Fatalf("expected error for destination %q, got nil", tt.destination)
 			}
 		})

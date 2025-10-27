@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"context"
@@ -13,7 +13,8 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-func getNodeList() ([]string, error) {
+// GetNodeList returns a list of nodes in the cluster.
+func GetNodeList() ([]string, error) {
 
 	var simpleList []string
 
@@ -43,7 +44,8 @@ func getNodeList() ([]string, error) {
 	return simpleList, nil
 }
 
-func getNodeName() (string, error) {
+// GetNodeName returns the name of the current node.
+func GetNodeName() (string, error) {
 	name := os.Getenv("NODE_NAME")
 
 	var err error
@@ -57,7 +59,8 @@ func getNodeName() (string, error) {
 
 }
 
-func pingHost(destination string) (time.Duration, error) {
+// PingHost pings a host and returns the RTT.
+func PingHost(destination string) (time.Duration, error) {
 	bind := "0.0.0.0"
 
 	var remoteAddr *net.IPAddr
