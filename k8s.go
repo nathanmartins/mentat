@@ -2,14 +2,15 @@ package main
 
 import (
 	"context"
-	"github.com/digineo/go-ping"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
 	"log"
 	"net"
 	"os"
 	"time"
+
+	"github.com/digineo/go-ping"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 )
 
 func getNodeList() ([]string, error) {
@@ -62,12 +63,13 @@ func pingHost(destination string) (time.Duration, error) {
 	var remoteAddr *net.IPAddr
 	var pinger *ping.Pinger
 	var rtt time.Duration
+	var err error
 
-	if remoteAddr, err := net.ResolveIPAddr("ip4", destination); err != nil {
+	if _, err = net.ResolveIPAddr("ip4", destination); err != nil {
 		return rtt, err
 	}
 
-	if pinger, err := ping.New(bind, ""); err != nil {
+	if pinger, err = ping.New(bind, ""); err != nil {
 		return rtt, err
 	}
 
@@ -75,7 +77,7 @@ func pingHost(destination string) (time.Duration, error) {
 
 	timeout, _ := time.ParseDuration("30s")
 
-	rtt, err := pinger.PingAttempts(remoteAddr, timeout, int(3))
+	rtt, err = pinger.PingAttempts(remoteAddr, timeout, int(3))
 
 	if err != nil {
 		return rtt, err
