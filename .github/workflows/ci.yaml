@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  workflow_dispatch: # Manual trigger
+  workflow_call: # Call from another workflow
+  push:
+    branches: [master, main]
+    paths:
+    - "**.go"
+  pull_request:
+    branches: [master, main]
+    paths:
+    - "**.go"
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash -Eeuo pipefail {0}
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  run:
+    name: CI
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+
+    - name: Check out code
+      uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
+
+    - name: Restore cached CI Dependencies
+      id: cache-ci-dependencies-restore
+      uses: actions/cache/restore@v4
+      with:
+        path: |
+          /usr/local/bin/gotestfmt
+        key: ${{ runner.os }}-ci-dependencies
+
+    - name: Install Go
+      id: cache-go
+      uses: actions/setup-go@v6
+      with:
+        go-version-file: 'go.mod'
+
+    - name: Install `gotestfmt`
+      if: steps.cache-ci-dependencies-restore.outputs.cache-hit != 'true'
+      run: go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@latest && mv /home/runner/go/bin/gotestfmt /usr/local/bin/
+
+    - name: Save CI dependencies
+      id: cache-ci-dependencies-save
+      if: steps.cache-ci-dependencies-restore.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        path: |
+          /usr/local/bin/gotestfmt
+        key: ${{ steps.cache-ci-dependencies-restore.outputs.cache-primary-key }}
+
+    - name: Go mod download
+      if: steps.cache-go.outputs.cache-hit != 'true'
+      run: go mod download -x
+
+    - name: Go Build
+      run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /dev/null
+
+    - name: Run tests
+      run: |
+        go test -json -v ./... 2>&1 | tee /tmp/gotest.log | gotestfmt
+
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v8
+      with:
+        args: "--timeout=2m"
+        skip-save-cache: true
+        skip-cache: true
