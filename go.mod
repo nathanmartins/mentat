@@ -5,7 +5,7 @@ go 1.25.3
 require (
 	github.com/digineo/go-ping v1.2.0
 	github.com/prometheus/client_golang v1.23.2
-	github.com/spf13/cobra v1.10.1
+	github.com/spf13/cobra v1.10.2
 	k8s.io/apimachinery v0.35.3
 	k8s.io/client-go v0.35.3
 )
