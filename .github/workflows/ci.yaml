@@ -75,7 +75,7 @@ jobs:
         go test -json -v ./... 2>&1 | tee /tmp/gotest.log | gotestfmt
 
     - name: golangci-lint
-      uses: golangci/golangci-lint-action@v8
+      uses: golangci/golangci-lint-action@v9
       with:
         args: "--timeout=2m"
         skip-save-cache: true
