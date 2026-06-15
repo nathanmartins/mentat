@@ -22,7 +22,7 @@ ENV CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH:-amd64}
 RUN go build -trimpath -ldflags "-s -w -extldflags -static" -o /out/mentat .
 
 # ---------- Runtime ----------
-FROM alpine:3.23
+FROM alpine:3.24
 
 # Optional: `libcap-utils` allows setting file capabilities if you prefer not to run the container with --cap-add=NET_RAW.
 # Note: File capabilities require the image filesystem to support xattrs and may not survive certain copy operations.
